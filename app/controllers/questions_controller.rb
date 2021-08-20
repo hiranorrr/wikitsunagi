@@ -1,25 +1,47 @@
 require "net/http"
 require 'json'
+require 'nokogiri'
+require 'open-uri'
 
 class QuestionsController < ApplicationController
     # 問題の生成
     def make_question
-        render json: {items: {title1: get_title, title2: get_title}}
+        render json: get_titles_from_kujiland
     end
 
-    # Wikipediaのランダムなタイトルを取得
-    def get_title
-        # MediaWiki APIを利用して, ランダムなwikiのサイトの情報を取得
-        uri = URI.parse("https://ja.wikipedia.org/w/api.php?format=json&action=query&generator=random&grnnamespace=0&prop=info")
+    # 複数のWikipediaのランダムなタイトルを取得
+    def get_titles_from_wiki(num=50)
+        uri = URI.parse("https://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=#{num}")
         response = Net::HTTP.get_response(uri)
 
-        # サイト情報からタイトルを抽出
         body = response.body
         body_hash = JSON.parse(body)
-        title = ""
-        body_hash['query']['pages'].each do |k,v|
-            title = v['title']
+
+        titles = {}
+        index = 0
+        body_hash['query']['random'].each do |elm|
+            titles["title#{index}"] = elm["title"]
+            index += 1
         end
-        return title
+
+        return titles.to_json
+    end
+
+    # くじらんどのAPIを利用し, タイトルを取得
+    def get_titles_from_kujiland
+        # 対象のURL
+        url = "https://kujirahand.com/web-tools/words/api.php?m=random?"
+
+        # # NokogiriでURLの情報を取得する
+        contents = Nokogiri::HTML.parse(URI.open(url),nil,"utf-8")
+
+        titles = {}
+        index = 0
+        contents.css('a').each do |link|
+            titles["title#{index}"] = link.content
+            index += 1
+        end
+
+        return titles.to_json
     end
 end
