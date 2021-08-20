@@ -38,10 +38,30 @@ class QuestionsController < ApplicationController
         titles = {}
         index = 0
         contents.css('a').each do |link|
-            titles["title#{index}"] = link.content
-            index += 1
+            if exist?(link.content)
+                titles["title#{index}"] = link.content
+                index += 1
+            end
         end
 
         return titles.to_json
+    end
+
+    # 生成した単語がWikipediaに存在するか確認
+    def exist?(word)
+        uri = URI("https://ja.wikipedia.org/w/api.php?")
+        params = {  format: 'json',
+                    action: 'query',
+                    list: 'search',
+                    srsearch: word
+        }
+        uri.query = URI.encode_www_form(params)
+
+        response = Net::HTTP.get_response(uri)
+
+        body = response.body
+        body_hash = JSON.parse(body)
+
+        return body_hash['query']['search'][0]['title'] == word
     end
 end
