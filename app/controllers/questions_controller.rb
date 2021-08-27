@@ -69,6 +69,11 @@ class QuestionsController < ApplicationController
         body = response.body
         body_hash = JSON.parse(body)
 
+        # 検索にかからなかった時の処理
+        if body_hash['query']['search'] == []
+            return false
+        end
+
         return body_hash['query']['search'][0]['title'] == word
     end
 end
