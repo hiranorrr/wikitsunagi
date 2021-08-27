@@ -6,12 +6,19 @@ require 'open-uri'
 class QuestionsController < ApplicationController
     # 問題の生成
     def make_question
-        render json: get_titles_from_kujiland
+        render json: get_titles_from_kujirahand
     end
 
     # 複数のWikipediaのランダムなタイトルを取得
     def get_titles_from_wiki(num=50)
-        uri = URI.parse("https://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=#{num}")
+        uri = URI("https://ja.wikipedia.org/w/api.php?")
+        params = {  format: 'json',
+                    action: 'query',
+                    list: 'random',
+                    rnnamespace: 0,
+                    rnlimit: num
+        }
+        uri.query = URI.encode_www_form(params)
         response = Net::HTTP.get_response(uri)
 
         body = response.body
@@ -27,10 +34,10 @@ class QuestionsController < ApplicationController
         return titles.to_json
     end
 
-    # くじらんどのAPIを利用し, タイトルを取得
-    def get_titles_from_kujiland
+    # くじらはんどのAPIを利用し, タイトルを取得
+    def get_titles_from_kujirahand
         # 対象のURL
-        url = "https://kujirahand.com/web-tools/words/api.php?m=random?"
+        url = "https://kujirahand.com/web-tools/words/api.php?m=random"
 
         # # NokogiriでURLの情報を取得する
         contents = Nokogiri::HTML.parse(URI.open(url),nil,"utf-8")
