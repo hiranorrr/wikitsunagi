@@ -76,4 +76,33 @@ class QuestionsController < ApplicationController
 
         return body_hash['query']['search'][0]['title'] == word
     end
+
+    # データベースの登録
+    def register
+        root_path = Pathname('public/data')
+        Pathname.glob(root_path / "*") do |category_path|
+            register_db(category_path.basename)
+        end
+    end
+
+    # カテゴリーごとのデータベースの更新
+    def register_db(category)
+        root_path = Pathname('public/data')
+        path = root_path.join(category)
+        File.open(path.join('exist.txt').to_path) do |file|
+            file.each_line do |subject|
+                word = Word.new(content: subject.chomp, category: category)
+                word.save
+            end
+        end
+    end
+
+    # データベースのデータを取得
+    def get_db
+        category = params[:category]
+        words = Word.where(category: category).order("RAND()").limit(2)
+        word = {unique_id: 0, data: {category: category, start: words[0].content, goal: words[1].content}}
+        render json: word.to_json
+    end
+
 end
