@@ -57,10 +57,11 @@ class QuestionsController < ApplicationController
     # 生成した単語がWikipediaに存在するか確認
     def exist?(word)
         uri = URI("https://ja.wikipedia.org/w/api.php?")
-        params = {  format: 'json',
-                    action: 'query',
-                    list: 'search',
-                    srsearch: word
+        params = {
+            format: 'json',
+            action: 'query',
+            list: 'search',
+            srsearch: word
         }
         uri.query = URI.encode_www_form(params)
 
@@ -77,31 +78,73 @@ class QuestionsController < ApplicationController
         return body_hash['query']['search'][0]['title'] == word
     end
 
-    # データベースの登録
-    def register
-        root_path = Pathname('public/data')
-        Pathname.glob(root_path / "*") do |category_path|
-            register_db(category_path.basename)
+    # Weblioからデータを取得し, DBに保存
+    def scraping
+        category = params[:category]
+        date = params[:date]
+
+        # 時間の指定がない時に現在の日時を取得
+        if date.nil?
+            t = Time.now
+            date = t.strftime("%Y%m%d")
+        end
+
+        if category.nil?
+            category_list = ['computer', 'engineering', 'academic','culture', 'healthcare', 'hobby', 'sports', 'nature', 'food', 'people']
+            category_list.each do |category|
+                subscraping(category, date)
+            end
+        else
+            subscraping(category, date)
         end
     end
 
-    # カテゴリーごとのデータベースの更新
-    def register_db(category)
-        root_path = Pathname('public/data')
-        path = root_path.join(category)
-        File.open(path.join('exist.txt').to_path) do |file|
-            file.each_line do |subject|
-                word = Word.new(content: subject.chomp, category: category)
-                word.save
+    # categoryとdateを指定して, データを取得保存
+    def subscraping(category, date)
+        # weblioのランキングのURL
+        url = "https://www.weblio.jp/ranking/#{category}/#{date}"
+
+        # データの取得, 保存
+        contents = Nokogiri::HTML.parse(URI.open(url),nil,"utf-8")
+        ranking = contents.at("table.mainRankCC")
+        ranking_table = ranking.search("tr")
+        ranking_table.each do |text|
+            title = text.at_css('a')[:title]
+            if exist?(title)
+                post = Post.new(content: title, category: category, date: str2date(date))
+                post.save
             end
         end
+    end
+
+    # stringをdate型に変換
+    def str2date(date)
+        return date[0,4] + '-' + date[4,2] + '-' + date[6,2]
+    end
+
+    # DBの指定したカラム名を取得
+    def get_column_name
+        name = params[:name]
+        column = Post.select(name).distinct
+        column_list = []
+        column.each do |c|
+            column_list.push(c[name.to_sym])
+        end
+        result = {result: column_list}
+        render json: result.to_json
     end
 
     # データベースのデータを取得
     def get_db
         category = params[:category]
-        words = Word.where(category: category).order("RAND()").limit(2)
-        word = {unique_id: 0, data: {category: category, start: words[0].content, goal: words[1].content}}
+        date = params[:date]
+        num = params[:num]
+        data = Post.where(category: category, date: date).order("RAND()").limit(num)
+        words = []
+        data.each do |d|
+            words.push(d.content)
+        end
+        word = {category: category, contents: words}
         render json: word.to_json
     end
 

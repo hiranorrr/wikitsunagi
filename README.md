@@ -24,7 +24,7 @@ Things you may want to cover:
 * ...
 # wikitsunagi
 ### データベースの作成方法
-+ モデルの作成(Dockerfileか何かに追記したい)
++ モデルの作成(shell scriptか何かに追記したい)
 ```
 $ docker-compose run --rm api rails generate scaffold Word content:text category:text
 $ docker-compose run --rm api rails db:create
