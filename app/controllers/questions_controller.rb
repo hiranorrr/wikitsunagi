@@ -35,25 +35,22 @@ class QuestionsController < ApplicationController
         return link_lst
     end
 
-    def verify_answer(answer=['ジョジョの奇妙な冒険', 'ジョン・レノン', '1955年', '上沼恵美子'])
+    def verify_answer(answer=['ジョジョの奇妙な冒険', 'リアル脱出ゲーム', 'コシノジュンコ', '上沼恵美子'])
         result = false
-        (1..answer.length).each do |i|
-            ans = answer[i-1]
+        (0..answer.length-2).each do |i|
+            ans = answer[i]
+            next_ans = answer[i + 1]
             next_link_lst = get_next_link_lst(ans)
             
-            if not next_link_lst.include?(ans)
+            if !next_link_lst.include?(next_ans)
                 break
             end
 
-            puts i
-            puts next_link_lst.include?(ans)
-
-            if i == answer.length
+            if i == answer.length - 2
                 result = true
             end
         end
-        # render json: {items: result}
-        # render json: {items: get_nex t_link_lst('ジョジョの奇妙な冒険')}
+        render json: {items: result}
     end
 
 end
