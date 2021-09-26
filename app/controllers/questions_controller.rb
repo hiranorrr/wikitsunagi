@@ -9,7 +9,6 @@ require 'csv'
 
 require "net/http"
 
-
 class QuestionsController < ApplicationController
     def get_next_link_lst(now_link)
         uri = URI("https://ja.wikipedia.org/w/api.php?")
@@ -52,5 +51,5 @@ class QuestionsController < ApplicationController
         end
         render json: {items: result}
     end
-
+  
 end
