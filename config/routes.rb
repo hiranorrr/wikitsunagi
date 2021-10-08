@@ -4,5 +4,5 @@ Rails.application.routes.draw do
   get "questions/scraping" => "posts#scraping"
   get "questions/show/contents" => "posts#get_db"
   get "questions/show/column/:name" => "posts#get_column_name"
-  get "questions/verify_answer" => "questions#verify_answer"
+  post "questions/verify_answer" => "questions#verify_answer"
 end

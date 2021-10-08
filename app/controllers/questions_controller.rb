@@ -7,8 +7,6 @@ require 'nokogiri'
 # CSV出力するClass
 require 'csv'
 
-require "net/http"
-
 class QuestionsController < ApplicationController
     def get_next_link_lst(now_link)
         uri = URI("https://ja.wikipedia.org/w/api.php?")
@@ -34,22 +32,24 @@ class QuestionsController < ApplicationController
         return link_lst
     end
 
-    def verify_answer(answer=['ジョジョの奇妙な冒険', 'リアル脱出ゲーム', 'コシノジュンコ', '上沼恵美子'])
+    def verify_answer()
+        # params['answer'] = {'first': 'ジョジョの奇妙な冒険', 'second': 'リアル脱出ゲーム', 'third': 'コシノジュンコ', 'forth': '上沼恵美子'}
+        answers = params['answer'].values
         result = false
-        (0..answer.length-2).each do |i|
-            ans = answer[i]
-            next_ans = answer[i + 1]
+        (0..answers.length-2).each do |i|
+            ans = answers[i]
+            next_ans = answers[i + 1]
             next_link_lst = get_next_link_lst(ans)
             
             if !next_link_lst.include?(next_ans)
                 break
             end
 
-            if i == answer.length - 2
+            if i == answers.length - 2
                 result = true
             end
         end
-        render json: {items: result}
+        render json: result
     end
   
 end
