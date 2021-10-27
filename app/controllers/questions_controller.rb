@@ -6,6 +6,7 @@ require 'nokogiri'
 
 # CSV出力するClass
 require 'csv'
+require "net/http"
 
 class QuestionsController < ApplicationController
     def get_next_link_lst(now_link)
@@ -34,7 +35,8 @@ class QuestionsController < ApplicationController
 
     def verify_answer()
         # params['answer'] = {'first': 'ジョジョの奇妙な冒険', 'second': 'リアル脱出ゲーム', 'third': 'コシノジュンコ', 'forth': '上沼恵美子'}
-        answers = params['answer'].values
+        # params['answer'] = ['ジョジョの奇妙な冒険', 'リアル脱出ゲーム', 'コシノジュンコ', '上沼恵美子']
+        answers = params['answer']
         result = false
         (0..answers.length-2).each do |i|
             ans = answers[i]
