@@ -23,14 +23,15 @@ Things you may want to cover:
 
 * ...
 # wikitsunagi
-### データベースの作成方法
-+ モデルの作成(shell scriptか何かに追記したい)
+### 環境変数に自分のipアドレスを追加する方法
+.zshrcやら.bashrcやらに以下を追記
 ```
-$ docker-compose run --rm api rails generate scaffold Word content:text category:text
-$ docker-compose run --rm api rails db:create
-$ docker-compose run --rm api rails db:migrate
+$ export LOCAL_HOST_IP=`ifconfig en0 | grep inet | grep -v inet6 | sed -E "s/inet ([0-9]{1,3}.[0-9]{1,3}.[0-9].{1,3}.[0-9]{1,3}) .*$/\1/" | tr -d "\t"`
+$ source .zshrc
 ```
-+ 元データを保存
-    + publicディレクトリにdataを保存
-+ データベースに登録
-    + questionsコントローラのregisterを実行(routes.rbにてコメントアウトされているので適宜外す)
+以下のコマンドを実行すると自分のipアドレスが出力されることを確認する
+```
+echo $LOCAL_HOST_IP
+```
+
+
