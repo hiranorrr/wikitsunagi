@@ -8,6 +8,8 @@ services:
       - .:/wikitsunagi # アプリケーションファイルの同期
     depends_on:
       - db
+    extra_hosts:
+      - "gohost:${LOCAL_HOST_IP}"
     command: ["rails", "server", "-b", "0.0.0.0"]
   db: # MySQLが起動するコンテナ
     image: mysql:8.0.21
