@@ -10,6 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+# <<<<<<< feature/generate_suggestion
+# ActiveRecord::Schema.define(version: 2021_08_22_112132) do
+
+#   create_table "suggestions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+
 ActiveRecord::Schema.define(version: 2021_09_20_151759) do
 
   create_table "posts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
