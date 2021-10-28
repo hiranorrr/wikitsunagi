@@ -24,9 +24,12 @@ Things you may want to cover:
 * ...
 # wikitsunagi
 ### 環境変数に自分のipアドレスを追加する方法
-.zshrcやら.bashrcやらに以下を追記
+.zshrcやら.bashrcやらに以下を追記し, 保存
 ```
 $ export LOCAL_HOST_IP=`ifconfig en0 | grep inet | grep -v inet6 | sed -E "s/inet ([0-9]{1,3}.[0-9]{1,3}.[0-9].{1,3}.[0-9]{1,3}) .*$/\1/" | tr -d "\t"`
+```
+以下のコマンドを実行
+```
 $ source .zshrc
 ```
 以下のコマンドを実行すると自分のipアドレスが出力されることを確認する
